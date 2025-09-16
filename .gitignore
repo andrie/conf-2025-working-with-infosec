@@ -1,0 +1,28 @@
+# Generated files
+node_modules
+output
+dist
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+public/animations/
+node_modules/
+/.quarto/
+_site
+*_files/
+/.luarc.json
+
+_fonts
+_raw_images/
+images-not-used/
+infosec.html
+todo.qmd

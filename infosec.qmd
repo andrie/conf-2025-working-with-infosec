@@ -1,0 +1,122 @@
+---
+# title: "Working with InfoSec"
+format: 
+  revealjs:
+    width: 1920
+    height: 1080
+    mainfont: Open_Sans
+    transition: fade
+    transition-speed: slow
+    background-transition: fade
+    resources:
+    - dist/*/*
+    - _fonts/*/*
+    theme: 
+    - night
+    - custom.scss
+    # - extent.scss
+    menu: false
+    include-in-header: 
+      - text: <script src="./dist/motion-canvas-ts.js"></script>
+    appearance:
+      autoappear: true
+      autoelements: {"img": {"animation":"animate__fadeIn", "speed":"slow", "delay":"50"}}
+      appearevent: slidechanged
+    gongtimer:
+      allottedTime: 5
+      barColor: "#447099"
+
+project:
+  preview:
+    port: 4200
+    .browser: false
+revealjs-plugins:
+  - appearance
+  - gongtimer
+
+---
+
+## Working with Infosec {.hidetitle}
+
+{{< motion-canvas ./animations/posit_footer.js auto fullscreen=true >}}
+
+# The great idea
+
+
+## The thrill of building a great app
+
+![](_img/llm_app.drawio.svg){width=800px height=600px style="display:block; margin:auto;"}
+
+
+
+## Infosec triad
+
+![](_img/infosec_triad.drawio.svg)
+
+## Building an LLM app
+
+
+
+## Transition
+
+{{< motion-canvas ./animations/hexagons.js auto fullscreen=true loop=false >}}
+
+
+# Don't ask for forgiveness
+
+
+
+<!-- ## Don't ask for forgiveness, ask for permission. -->
+
+## You've made something cool / great
+
+## An AI is especially powerful if it touches multiple data sources
+
+- Mixing SFDC and zendesk
+- You can easily expose secrets this way
+
+## There is good reason why InfoSec will put on the brakes
+- Create read-only copy of the data you actually work with
+- The danger comes when you push the modified data back into production
+
+
+# Change your mindset
+
+## Don't ask for forgiveness, ask for permission
+
+- A good InfoSec team will not try to block you, but to enable
+- But they need to protect the company and assets of the company
+
+## Start the conversation as early as possible
+
+- Once you realise your bot will touch production data
+
+## Think ahead to working with the least amount of access
+
+- This will increase design time
+- But reduce risk and make it easier to pass the hurdles
+- Don't provide admin access if you don't need it
+
+
+# Human factors are real!
+<!-- Put the line of tension here! -->
+
+
+
+# With these steps in mind you can work IT!
+
+- There are really good reasons to be careful
+- Following these will make your life easier
+
+# I’m not claiming this is as easy as I say
+
+<!-- Find the moment of tension -->
+You probably have PTSD from decades of being blocked by IT
+
+
+
+
+## End
+
+{{< motion-canvas ./animations/posit_footer.js auto fullscreen=true >}}
+
