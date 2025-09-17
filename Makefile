@@ -9,8 +9,8 @@ all: anim quarto publish
 
 # Target for building animations
 anim:
-	npm --prefix ./animations run build
 	npm run build
+	npm --prefix ./animations run build
 
 
 serve:
@@ -27,4 +27,5 @@ publish:
 	quarto publish $(QMD_FILE) --no-prompt
 
 clean:
-	rm -Recurse -Force -ErrorAction SilentlyContinue .\dist
+	powershell -Command "Remove-Item -Recurse -Force -ErrorAction SilentlyContinue .\dist"
+

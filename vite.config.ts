@@ -19,18 +19,18 @@ export default defineConfig({
               src: 'public/animations/*.js', 
               dest: 'dist/' 
             },
-            { 
-              src: 'public/animations/src/*.js', 
-              dest: 'dist/animations' 
-            },
-            { 
-              src: 'animations/public/_fonts/', 
-              dest: 'dist/public/_fonts/' 
-            },
-            // { 
-            //   src: 'dist/animations/src', 
-            //   dest: 'dist/animations/' 
-            // },
+          //   { 
+          //     src: 'public/animations/src/*.js', 
+          //     dest: 'dist/animations/src/' 
+          //   },
+          //   { 
+          //     src: 'animations/public/_fonts/', 
+          //     dest: 'dist/public/_fonts/' 
+          //   },
+          //   // { 
+          //   //   src: 'dist/animations/src', 
+          //   //   dest: 'dist/animations/' 
+          //   // },
           ],
           hook: 'writeBundle' // run the plugin after the bundle is written
         })
