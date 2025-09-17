@@ -1,0 +1,4 @@
+- source: infosec.qmd
+  quarto-pub:
+    - id: 5ccdbc66-2cfb-4bc1-845c-5122af591e6e
+      url: https://andrie.quarto.pub/infosec
