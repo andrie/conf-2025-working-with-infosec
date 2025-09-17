@@ -1,61 +1,71 @@
-// Define the prependBase function
-function stopAnimation() {
-  const currentSlide = document.querySelector('.reveal .slides > section.present');
-
-  // Select all 'motion-canvas-player' elements in the current slide
-  if (currentSlide) {
-
+// stop the animation if the loop attribute is set to false
+function stopAnimation(event) {
+  // if (event) console.log("event found"); else console.log("no event");
+  // if (ct) console.log("ct player found");
+  // console.log(ct)
+  // const player = document.querySelector('section.present.slide.present motion-canvas-player')
+  const player = Reveal.getCurrentSlide().querySelector('motion-canvas-player');
+  if (player) {
     // this code assumes one animation per slide
     // TODO: make it work with multiple animations per slide
     
-    const player = currentSlide.querySelector('motion-canvas-player')
+    // start the animation
+    console.log('setting auto to true')
+    player.setAttribute('auto', 'true');
 
-    // console.log(player.getAttribute('loop'))
 
-    if (player.getAttribute('loop') === 'false'  ) {
-      setTimeout(() => {
-        pname = player.player.project.name
-        console.log("<motio-canvas-player> Waiting for animation '" + pname + "' to end...")
-        const frameCheckInterval = setInterval(() => {
-          f = player.player.frame.value;
-          nf = player.player.endFrame;
-          if (f === nf) {
-            console.log("<motio-canvas-player> End of animation '" + pname + "' reached.");
-            player.player.togglePlayback();
-            player.player.requestSeek(nf);
-            player.player.deactivate();
+    const startCheckInterval = setInterval(() => {
+      // wait for player to start
+      console.log('checking player...')
+      if (player.player) {
+        clearInterval(startCheckInterval);
+        const fps = 60;
+        if (player.getAttribute('loop') === 'false'  ) {
+          const frameCheckInterval = setInterval(() => {
+            if (player.player && !player.player.active) {
+              player.player.activate()
+            }
+            if (player.player && player.player.frame) {
+              const f = player.player.frame.value;
+              const nf = player.player.endFrame;
+              if (f === nf) {
+                clearInterval(frameCheckInterval);
+                player.player.requestSeek(nf);
+                player.player.deactivate();
+              }
+            }
+          }, 1000 / fps); // Check every frame (assuming 60 FPS)
+          
+          // Clear the interval when the slide changes
+          Reveal.addEventListener('slidechanged', () => {
             clearInterval(frameCheckInterval);
-          }
-        }, 1000 / 60); // Check every frame (assuming 60 FPS)
-        
-        // Clear the interval when the slide changes
-        Reveal.addEventListener('slidechanged', () => {
-          clearInterval(frameCheckInterval);
-        });
+          });
+        }
+      }
+    }, 50)  // wait for player to start
 
-      }, 1000); // Adjust the delay as needed
+  }
+
+  // pause the previous slide if it contains an animation
+  // console.log(event.previousSlide);
+  if (event && event.previousSlide) {
+    const prevPlayer = event.previousSlide.querySelector('motion-canvas-player');
+    if (prevPlayer) {
+      prevPlayer.player.togglePlayback();
     }
   }
 }
 
-
 // Check every 100ms if Reveal is defined
-var checkReveal = setInterval(function() {
-  if (window.Reveal) {
-    // If Reveal is defined, set up the event listener and clear the interval
-    Reveal.addEventListener('ready', stopAnimation);
-    Reveal.addEventListener('slidechanged', stopAnimation);
-    clearInterval(checkReveal);
-  }
-}, 1000);
-
-// Notes
-// players[0].player.playback.duration  // duration (frames) of the animation
-// players[0].player.endFrame          // last frame of the animation
-// players[0].player.requestSeek(861)   // seek to a specific frame
-
-
-// Define the watchEndFrame function
-
-// Add the event listener for the 'slidechanged' event
-// Reveal.addEventListener('slidechanged', watchEndFrame);
+document.addEventListener("DOMContentLoaded", function() {
+  // Your function goes here
+  const checkReveal = setInterval(function() {
+    if (window.Reveal && Reveal.isReady()) {
+      // If Reveal is defined, set up the event listener and clear the interval
+      console.log("Reveal is ready")
+      stopAnimation()
+      Reveal.on('slidechanged', stopAnimation);
+      clearInterval(checkReveal);
+    }
+  }, 50);
+});
