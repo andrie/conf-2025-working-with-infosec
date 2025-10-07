@@ -2,7 +2,7 @@ QMD_FILE = infosec.qmd
 PORT = 4200
 
 # Phony target to prevent file name conflict
-.PHONY: all anim quarto publish serve preview clean scene
+.PHONY: all build anim quarto publish serve preview clean scene
 
 # Default target
 all: anim quarto publish
@@ -18,27 +18,23 @@ scene:
 	./node_modules/.bin/vite build
 
 
-anim:
-# 	npm run build
+build:
+	npm run build
 	npm --prefix ./animations run build
+
+anim: build
 
 
 serve:
 	npm --prefix ./animations run serve
 
-quarto:
-	npm run build
-	npm --prefix ./animations run build
+quarto: anim
 	quarto render $(QMD_FILE)
 
-preview:
-# 	npm run build
-	npm --prefix ./animations run build
+preview: anim
 	quarto preview $(QMD_FILE) --no-browser --port ${PORT}
 
-publish:
-	npm run build
-	npm --prefix ./animations run build
+publish: anim
 	quarto render $(QMD_FILE)
 	quarto publish $(QMD_FILE) --no-prompt
 
