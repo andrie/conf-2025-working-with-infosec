@@ -7,9 +7,19 @@ PORT = 4200
 # Default target
 all: anim quarto publish
 
+
+install:
+	cd animations && rm -rf node_modules package-lock.json
+	mnpm install
+
 # Target for building animations
+
+scene:
+	./node_modules/.bin/vite build
+
+
 anim:
-	npm run build
+# 	npm run build
 	npm --prefix ./animations run build
 
 
@@ -17,12 +27,18 @@ serve:
 	npm --prefix ./animations run serve
 
 quarto:
+	npm run build
+	npm --prefix ./animations run build
 	quarto render $(QMD_FILE)
 
 preview:
+	npm run build
+	npm --prefix ./animations run build
 	quarto preview $(QMD_FILE) --no-browser --port ${PORT}
 
 publish:
+	npm run build
+	npm --prefix ./animations run build
 	quarto render $(QMD_FILE)
 	quarto publish $(QMD_FILE) --no-prompt
 

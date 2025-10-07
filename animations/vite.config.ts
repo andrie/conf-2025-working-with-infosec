@@ -9,6 +9,7 @@ export default defineConfig({
         "./src/hexagons.ts",
         "./src/posit_footer.ts",
         "./src/posit-logo.ts",
+        "./src/shiny-ellmer.ts"
       ],
     }),
   ],

@@ -42,6 +42,7 @@ revealjs-plugins:
 
 # About twenty lines of {ellmer} code
 
+{{< motion-canvas ./animations/src/shiny-ellmer.js auto fullscreen >}}
 
 ## The thrill of building a great app {.hidetitle}
 
