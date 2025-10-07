@@ -1,26 +1,24 @@
-import {makeScene2D, LezerHighlighter} from '@motion-canvas/2d';
+import {makeScene2D} from '@motion-canvas/2d';
 import {createRef} from '@motion-canvas/core';
 import {Rect, Txt, Line, Circle, Code} from '@motion-canvas/2d/lib/components';
 import {Posit, Colors} from '../styles';
 import {parser} from 'lezer-r';
-import {HighlightStyle} from '@codemirror/language';
-import {tags} from '@lezer/highlight';
+import {Database} from '../components/Database';
+import {RHighlighter} from '../components/RHighlighter';
+
 
 export default makeScene2D(function* (view) {
-  // Create Posit-inspired HighlightStyle
-  const positStyle = HighlightStyle.define([
-    { tag: tags.keyword, color: Colors.KEYWORD },        // Posit red/pink for keywords
-    { tag: tags.string, color: Colors.STRING },          // Posit green for strings
-    { tag: tags.comment, color: Colors.COMMENT },        // Posit gray for comments
-    { tag: tags.function(tags.variableName), color: Colors.FUNCTION }, // Posit yellow for functions
-    { tag: tags.variableName, color: Posit.orange },     // Posit orange for variables
-    { tag: tags.literal, color: Colors.NUMBER },         // Posit blue for literals/numbers
-    { tag: tags.operator, color: Posit.teal },           // Posit teal for operators
-    { tag: tags.punctuation, color: Colors.TEXT },       // Posit text color for punctuation
-  ]);
-
-  // Create Posit-style LezerHighlighter
-  const positHighlighter = new LezerHighlighter(parser, positStyle);
+  // Create custom R highlighter with direct node type mapping
+  const rHighlighter = new RHighlighter(parser, {
+    default: Colors.TEXT,           // Base text color (Posit blue)
+    identifier: Posit.orange,       // Variable names
+    function: Colors.FUNCTION,      // Function names (yellow)
+    keyword: Colors.KEYWORD,        // Keywords like 'function' (pink)
+    string: Colors.STRING,          // Strings (green)
+    comment: Colors.COMMENT,        // Comments (gray)
+    operator: Posit.teal,          // Operators like <-, $ (teal)
+    number: Colors.NUMBER,          // Numbers (blue)
+  });
 
   // Create references for our elements
   const codeComponent = createRef<Code>();
@@ -31,9 +29,8 @@ export default makeScene2D(function* (view) {
   const appText = createRef<Txt>();
   const llmText = createRef<Txt>();
 
-  // Database cylinder elements
-  const dbTopEllipse = createRef<Circle>();
-  const dbBottomEllipse = createRef<Circle>();
+  // Database component
+  const database = createRef<Database>();
 
   // Connection lines
   const userToApp = createRef<Line>();
@@ -62,9 +59,10 @@ server <- function(input, output) {
       prompt = input$user_input,
       context = data
     )
-
+    
     # Display response
     output$llm_response <- renderText(response)
+    
   })
 }
 
@@ -76,13 +74,14 @@ shinyApp(ui = ui, server = server)
   view.add(
     <>
 
-      {/* Code component with Posit-style syntax highlighting */}
+      {/* Code component with custom R syntax highlighting */}
       <Code
         ref={codeComponent}
-        highlighter={positHighlighter}
+        highlighter={rHighlighter}
         code={rCode}
         fontSize={24}
         fontFamily="'JetBrains Mono', 'Fira Code', monospace"
+        fill={Colors.TEXT}
         position={[-450, 50]}
         width={850}
       />
@@ -126,49 +125,13 @@ shinyApp(ui = ui, server = server)
         position={[800, -100]}
       />
 
-      {/* Database cylinder - proper 3D database shape */}
-      {/* Top ellipse (full) */}
-      <Circle
-        ref={dbTopEllipse}
-        width={90}
-        height={20}
-        fill="rgba(0,0,0,0)"
+      {/* Database component - 3D database cylinder */}
+      <Database
+        ref={database}
+        size={[150, 150]}
         stroke={Posit.blue}
-        lineWidth={4.5}
-        position={[450, 120]}
-      />
-
-      {/* Bottom ellipse (partial - only front arc visible) */}
-      <Circle
-        ref={dbBottomEllipse}
-        width={90}
-        height={20}
-        fill="rgba(0,0,0,0)"
-        stroke={Posit.blue}
-        lineWidth={4.5}
-        position={[450, 180]}
-        startAngle={0}
-        endAngle={180}
-      />
-
-      {/* Left vertical line */}
-      <Line
-        points={[
-          [405, 120],
-          [405, 180]
-        ]}
-        stroke={Posit.blue}
-        lineWidth={4.5}
-      />
-
-      {/* Right vertical line */}
-      <Line
-        points={[
-          [495, 120],
-          [495, 180]
-        ]}
-        stroke={Posit.blue}
-        lineWidth={4.5}
+        lineWidth={6.75}
+        position={[450, 150]}
       />
 
       {/* Connection lines - bidirectional like SVG */}
@@ -203,7 +166,7 @@ shinyApp(ui = ui, server = server)
         ref={appToData}
         points={[
           () => appBox().bottom(),
-          () => dbTopEllipse().top()
+          () => database().top()
         ]}
         stroke={Posit.blue}
         lineWidth={4.5}

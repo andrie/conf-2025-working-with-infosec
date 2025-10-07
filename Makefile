@@ -2,7 +2,7 @@ QMD_FILE = infosec.qmd
 PORT = 4200
 
 # Phony target to prevent file name conflict
-.PHONY: all anim quarto publish serve preview clean
+.PHONY: all anim quarto publish serve preview clean scene
 
 # Default target
 all: anim quarto publish

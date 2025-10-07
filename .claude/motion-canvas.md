@@ -324,6 +324,87 @@ const githubDarkStyle = HighlightStyle.define([
 ]);
 ```
 
+**Custom Parser-Based Highlighters:**
+
+When community parsers like `lezer-r` don't provide comprehensive semantic highlighting, you can create a custom highlighter that maps parser node types directly to colors:
+
+```typescript
+import { Parser, Tree } from '@lezer/common';
+import { CodeHighlighter, HighlightResult } from '@motion-canvas/2d/lib/code/CodeHighlighter';
+
+export class RHighlighter implements CodeHighlighter<RCache | null> {
+  private readonly parser: Parser;
+  private readonly colors: Record<string, string>;
+
+  constructor(parser: Parser, colors: Record<string, string>) {
+    this.parser = parser;
+    this.colors = colors;
+  }
+
+  private walkTree(node: any, code: string, colorLookup: Map<string, string>) {
+    let color: string | null = null;
+
+    switch (node.name) {
+      case 'Identifier':
+        if (node.parent && node.parent.name === 'FunctionCall') {
+          color = this.colors.function;
+        } else {
+          color = this.colors.identifier;
+        }
+        break;
+      case 'function':
+        color = this.colors.keyword;
+        break;
+      case 'String':
+        color = this.colors.string;
+        break;
+      case 'AssignmentOperator':
+        color = this.colors.operator;
+        break;
+      // Add more cases as needed
+    }
+
+    // Only color terminal nodes to avoid container nodes overriding children
+    if (color && !node.firstChild) {
+      colorLookup.set(`${node.from}-${node.to}`, color);
+    }
+
+    // Recurse to children
+    let child = node.firstChild;
+    while (child) {
+      this.walkTree(child, code, colorLookup);
+      child = child.nextSibling;
+    }
+  }
+}
+```
+
+**Usage with Custom Highlighter:**
+```typescript
+import { RHighlighter } from '../components/RHighlighter';
+
+const rHighlighter = new RHighlighter(parser, {
+  default: Colors.TEXT,           // Base text color
+  identifier: Posit.orange,       // Variable names
+  function: Colors.FUNCTION,      // Function names
+  keyword: Colors.KEYWORD,        // Keywords
+  string: Colors.STRING,          // Strings
+  operator: Posit.teal,          // Operators
+});
+
+<Code
+  highlighter={rHighlighter}
+  code={rCode}
+  fill={Colors.TEXT}  // Fallback color for untagged text
+/>
+```
+
+**Key Benefits of Custom Highlighters:**
+- **Direct node mapping**: Works with any Lezer parser regardless of semantic highlighting support
+- **Complete control**: Define exactly which syntax elements get which colors
+- **Performance**: More efficient than semantic highlighting for simple use cases
+- **Debugging friendly**: Easy to see what parser nodes exist and how they map to colors
+
 **Code Component Properties:**
 - `code`: The code string to display
 - `highlighter`: Syntax highlighter instance

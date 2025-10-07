@@ -84,8 +84,10 @@ revealjs-plugins:
 
 ## Risk: data leakage
 
-- PII
+- Personally identifiable information (PII)
+- Confidential customer information
 - Trade secrets
+- Passwords, credentials and keys
 
 - Exposing data to individuals without permissions
 

@@ -6,7 +6,7 @@ export const Colors = {
   surfaceLight: '#c0b3a3',
 
   KEYWORD: '#ff6470',
-  TEXT: '#ACB3BF',
+  TEXT: '#447099',
   FUNCTION: '#ffc66d',
   STRING: '#99C47A',
   NUMBER: '#68ABDF',
