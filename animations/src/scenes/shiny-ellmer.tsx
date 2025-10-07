@@ -1,5 +1,5 @@
 import {makeScene2D} from '@motion-canvas/2d';
-import {createRef} from '@motion-canvas/core';
+import {createRef, waitFor, all, easeInCubic, easeOutCubic} from '@motion-canvas/core';
 import {Rect, Txt, Line, Circle, Code} from '@motion-canvas/2d/lib/components';
 import {Posit, Colors} from '../styles';
 import {parser} from 'lezer-r';
@@ -65,9 +65,6 @@ server <- function(input, output) {
     
   })
 }
-
-# Run the application
-shinyApp(ui = ui, server = server)
 `;
 
   // Add elements to view
@@ -82,8 +79,10 @@ shinyApp(ui = ui, server = server)
         fontSize={24}
         fontFamily="'JetBrains Mono', 'Fira Code', monospace"
         fill={Colors.TEXT}
-        position={[-450, 50]}
+        position={[-800, 50]}
         width={850}
+        textAlign="left"
+        offsetX={-1}
       />
 
       {/* User - no box, just text */}
@@ -177,5 +176,30 @@ shinyApp(ui = ui, server = server)
     </>
   );
 
-  // No animation for now
+  // Start with empty code
+  yield* codeComponent().code('', 0);
+
+  // Custom pulse animation for appBox - grow then shrink
+  yield* all(
+    appBox().lineWidth(15, 0.5, easeInCubic),
+    appBox().size([285, 170], 0.5, easeInCubic)
+  );
+  yield* all(
+    appBox().lineWidth(6.75, 0.5, easeOutCubic),
+    appBox().size([270, 135], 0.5, easeOutCubic)
+  );
+
+  // Animate code appearing line by line
+
+  // Split the R code into lines
+  const lines = rCode.split('\n');
+  let currentCode = '';
+
+  // Reveal each line with 0.25 second delay
+  for (let i = 0; i < lines.length; i++) {
+    currentCode += (i > 0 ? '\n' : '') + lines[i];
+    yield* codeComponent().code(currentCode, 0.1); // Quick transition
+    yield* waitFor(0.1); // Wait 0.25 seconds before next line
+  }
+
 });

@@ -64,7 +64,9 @@ return {
 
     local auto = combined["auto"] or ""
     if auto == "true" then
-      auto = "auto=true "
+      auto = 'auto="true" '
+    else 
+      auto = 'auto="false" '
     end
 
     local background = combined["background"] or ""
@@ -76,18 +78,27 @@ return {
   
     -- quarto.log.output(combined)
 
+    -- Handle loop parameter - include the attribute with its value
+    local loop = combined["loop"] or "true"  -- default to true
+    if loop == "false" then
+      loop = 'loop="false" '
+    else 
+      loop = ''
+    end
+
     local cmdArgs = ""
-    cmdArgs = cmdArgs .. 
+    cmdArgs = cmdArgs ..
       auto ..
-      parse_combined("loop", "true") ..
+      loop ..
       style ..
       width ..
       -- background ..
       ""
+
       
       local out = 
       '<motion-canvas-player src="' .. src .. '" ' .. cmdArgs ..'></motion-canvas-player>'
-      -- quarto.log.output(out)
+      quarto.log.output(out)
 
     return pandoc.RawInline('html', out)
   end

@@ -42,11 +42,11 @@ revealjs-plugins:
 
 # About twenty lines of {ellmer} code
 
-{{< motion-canvas ./animations/src/shiny-ellmer.js auto fullscreen >}}
+{{< motion-canvas ./animations/src/shiny-ellmer.js fullscreen loop=false auto=false >}}
 
-## The thrill of building a great app {.hidetitle}
+<!-- ## The thrill of building a great app {.hidetitle} -->
 
-![](_img/llm_app.drawio.svg){width=1200px height=900px style="display:block; margin:auto;"}
+<!-- ![](_img/llm_app.drawio.svg){width=1200px height=900px style="display:block; margin:auto;"} -->
 
 ## Touching multiple data sources
 
@@ -75,7 +75,7 @@ revealjs-plugins:
 - Director of Product Strategy, Posit
 :::
 
-{{< motion-canvas ./animations/src/posit_footer.js auto fullscreen=true >}}
+{{< motion-canvas ./animations/src/posit_footer.js fullscreen auto >}}
 
 ## What Infosec cares about
 
@@ -140,5 +140,5 @@ revealjs-plugins:
 
 ## End {.hidetitle}
 
-{{< motion-canvas ./animations/src/posit_footer.js auto fullscreen=true >}}
+{{< motion-canvas ./animations/src/posit_footer.js fullscreen=true >}}
 

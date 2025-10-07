@@ -32,7 +32,7 @@ quarto:
 	quarto render $(QMD_FILE)
 
 preview:
-	npm run build
+# 	npm run build
 	npm --prefix ./animations run build
 	quarto preview $(QMD_FILE) --no-browser --port ${PORT}
 
