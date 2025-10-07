@@ -1,14 +1,19 @@
 // stop the animation if the loop attribute is set to false
 function stopAnimation(event) {
-  // if (event) console.log("event found"); else console.log("no event");
-  // if (ct) console.log("ct player found");
-  // console.log(ct)
-  // const player = document.querySelector('section.present.slide.present motion-canvas-player')
+  // Pause all animations first to prevent unwanted playback
+  const allPlayers = document.querySelectorAll('motion-canvas-player');
+  allPlayers.forEach(p => {
+    if (p.player && p.player.playerState?.current?.paused === false) {
+      p.player.togglePlayback(); // Pause if playing
+    }
+  });
+
+  // Now handle the current slide's animation
   const player = Reveal.getCurrentSlide().querySelector('motion-canvas-player');
   if (player) {
     // this code assumes one animation per slide
     // TODO: make it work with multiple animations per slide
-    
+
     // start the animation
     console.log('motion-canvas.lua: setting auto to true')
     // console.log('motion-canvas.lua: loop = ', player.player.playerState("loop"))
@@ -76,13 +81,39 @@ function stopAnimation(event) {
   }
 }
 
+// Initialize all players to be paused
+function initializePlayers() {
+  const allPlayers = document.querySelectorAll('motion-canvas-player');
+  allPlayers.forEach(player => {
+    // The Lua extension already sets auto attribute, just ensure players are paused
+    // If player is already loaded, pause it
+    if (player.player) {
+      if (player.player.playerState?.current?.paused === false) {
+        player.player.togglePlayback(); // Pause
+      }
+    }
+  });
+}
+
 // Check every 100ms if Reveal is defined
 document.addEventListener("DOMContentLoaded", function() {
+  // Initialize all players to be paused first
+  initializePlayers();
+
   const checkReveal = setInterval(function() {
     if (window.Reveal && Reveal.isReady()) {
       // If Reveal is defined, set up the event listener and clear the interval
       // console.log("Reveal is ready")
-      stopAnimation()
+
+      // Re-initialize to ensure all are paused
+      initializePlayers();
+
+      // Only start animation on current slide if it should auto-start
+      const currentPlayer = Reveal.getCurrentSlide().querySelector('motion-canvas-player');
+      if (currentPlayer && currentPlayer.getAttribute('auto') === 'true') {
+        stopAnimation(); // This will start the current slide's animation
+      }
+
       Reveal.on('slidechanged', stopAnimation);
       clearInterval(checkReveal);
     }

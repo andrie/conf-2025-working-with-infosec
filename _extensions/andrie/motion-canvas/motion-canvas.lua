@@ -65,8 +65,8 @@ return {
     local auto = combined["auto"] or ""
     if auto == "true" then
       auto = 'auto="true" '
-    else 
-      auto = 'auto="false" '
+    else
+      auto = '' -- Don't include auto attribute if not needed
     end
 
     local background = combined["background"] or ""
