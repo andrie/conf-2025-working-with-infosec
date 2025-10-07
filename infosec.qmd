@@ -43,11 +43,13 @@ revealjs-plugins:
 # About twenty lines of {ellmer} code
 
 
-# The thrill of building a great app {.hidetitle}
+## The thrill of building a great app {.hidetitle}
 
 ![](_img/llm_app.drawio.svg){width=1200px height=900px style="display:block; margin:auto;"}
 
-## An AI is especially powerful if it touches multiple data sources
+## Touching multiple data sources
+
+![](_img/multiple_sources.drawio.svg){width=1200px height=900px style="display:block; margin:auto;"}
 
 ::: {.notes}
 - Mixing SFDC and zendesk
@@ -55,7 +57,8 @@ revealjs-plugins:
 :::
 
 
-# But... IT!
+
+# But... InfoSec!
 
 ::: {.notes}
 - Create read-only copy of the data you actually work with
@@ -90,7 +93,10 @@ revealjs-plugins:
 - Writing back to production systems
 - Creating data silos
 
-## Risk: leakage via the LLM
+## Risk: exposure via LLM provider
+
+- training on your data
+- and resultant possible data leakage via the model
 
 
 
@@ -100,25 +106,26 @@ revealjs-plugins:
 
 ## Consider:
 
-- Minimal permissions:
+- Authorisation
+  - Minimal permissions
   - Limit audience to trusted users
 
 <br/>
 
-- Run the model inside a trusted LLM gateway with guardrails
+- Data security
+  - Hosted models with guardrails
 
 <br/>
 
-- Do not write back to production systems
+- Scoped permissions
+  - Do not write back to production systems
   - Unless you've tested extensively
 
 
-# Don't ask for forgiveness, ask for permission.
+# Don't ask for forgiveness!
 
 - Start the conversation as early as possible
-- Once you realise your bot will touch production data
-- A good InfoSec team will not try to block you, but to enable
-- But they need to protect the company and assets of the company
+- Your InfoSec team will attempt to enable you
 
 
 
