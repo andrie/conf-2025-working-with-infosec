@@ -485,67 +485,86 @@ public vertex(index: number): Vector2 {
 2. **Actual Size Difference**: The visual polygon is smaller than the bounding box
 3. **Triangle Specifics**: For triangles, this difference is particularly noticeable
 
-**Triangle Positioning Calculations:**
+**Triangle Positioning Using vertex() Method:**
+The best approach for positioning elements around polygons is to use the `vertex()` method, which returns the exact coordinates of each polygon vertex:
+
 ```typescript
-// Triangle geometry in Motion Canvas
-const desiredWidth = 300;
-const desiredHeight = 200;
-
-// Compensate for inscribed behavior
-const triangleWidth = desiredWidth / 0.866;  // ~√3/2 compensation
-const triangleHeight = desiredHeight / 0.75; // Height compensation
-
-// Calculate actual triangle dimensions
-const actualTriangleHeight = (3/4) * triangleHeight; // 75% of bounding box
-const actualTriangleBottom = triangleHeight/2 - actualTriangleHeight/3;
+// Get exact vertex positions - no manual calculations needed
+const vertex0 = triangle().vertex(0); // Top vertex
+const vertex1 = triangle().vertex(1); // Bottom right vertex
+const vertex2 = triangle().vertex(2); // Bottom left vertex
 ```
 
 **Positioning Text Around Triangles:**
-When positioning text around polygon triangles, avoid using the bounding box dimensions:
+Use the `vertex()` method for precise positioning relative to actual triangle vertices:
 
 ```typescript
-// ❌ Wrong - uses bounding box bottom
+// ❌ Wrong - uses bounding box or manual geometry calculations
 position={() => [triangle().bottomLeft().x, triangle().bottomLeft().y + 50]}
+position={() => [triangle().position.x(), triangle().position.y() + calculatedBottom + 50]}
 
-// ✅ Correct - uses calculated triangle geometry
+// ✅ Correct - uses actual vertex positions
 const textSpacing = 100;
+
+// Position above top vertex (vertex 0)
 position={() => [
-  triangle().bottomLeft().x,
-  triangle().position.y() + actualTriangleBottom + textSpacing
+  triangle().vertex(0).x,
+  triangle().vertex(0).y - textSpacing
+]}
+
+// Position below bottom left vertex (vertex 2)
+position={() => [
+  triangle().vertex(2).x,
+  triangle().vertex(2).y + textSpacing
+]}
+
+// Position below bottom right vertex (vertex 1)
+position={() => [
+  triangle().vertex(1).x,
+  triangle().vertex(1).y + textSpacing
 ]}
 ```
 
-**Triangle Edge Alignment:**
-- **Top edge**: Triangle touches the top of bounding box: `position.y() - triangleHeight/2`
-- **Bottom edges**: Triangle vertices are at calculated position, not bounding box bottom
-- **Side alignment**: Use `bottomLeft().x` and `bottomRight().x` for horizontal positioning
+**Triangle Vertex Indexing:**
+For a standard triangle (3 sides), vertices are indexed as:
+- **Vertex 0**: Top point
+- **Vertex 1**: Bottom right point
+- **Vertex 2**: Bottom left point
 
 **Best Practices:**
-1. **Calculate actual geometry** rather than relying on bounding box dimensions
+1. **Use `vertex()` method** instead of manual geometry calculations
 2. **Use fixed spacing values** instead of percentage-based positioning for text
 3. **Test with different polygon sizes** to ensure positioning remains consistent
-4. **Consider rotation effects** when using rotated polygons
+4. **Consider rotation effects** - `vertex()` automatically accounts for rotation
 
 **Example Implementation:**
 ```typescript
-// InfoSec triad triangle with proper text positioning
+// InfoSec triad triangle with vertex-based positioning
 const textSpacing = 100;
 
-<Polygon sides={3} size={[triangleWidth, triangleHeight]} />
+<Polygon ref={triangleRef} sides={3} size={[width, height]} />
 
 <Txt
-  text="Top Label"
+  text="Confidentiality"
   position={() => [
-    triangle().position.x(),
-    triangle().position.y() - triangleHeight/2 - textSpacing
+    triangleRef().vertex(0).x,
+    triangleRef().vertex(0).y - textSpacing
   ]}
 />
 
 <Txt
-  text="Bottom Left"
+  text="Integrity"
   position={() => [
-    triangle().bottomLeft().x,
-    triangle().position.y() + actualTriangleBottom + textSpacing
+    triangleRef().vertex(2).x,
+    triangleRef().vertex(2).y + textSpacing
+  ]}
+/>
+
+<Txt
+  text="Availability"
+  position={() => [
+    triangleRef().vertex(1).x,
+    triangleRef().vertex(1).y + textSpacing
   ]}
 />
 ```

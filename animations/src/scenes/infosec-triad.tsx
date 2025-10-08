@@ -24,10 +24,6 @@ export default makeScene2D(function* (view) {
   const triangleWidth = desiredTriangleWidth / 0.866; // Compensate for ~√3/2 factor
   const triangleHeight = desiredTriangleHeight / 0.75; // Compensate for height reduction
 
-  // Calculate actual triangle geometry
-  // For inscribed triangle: top vertex touches top of bounding box, bottom vertices are at 2/3 down
-  const actualTriangleHeight = (3/4) * triangleHeight; // Triangle height is 3/4 of bounding box height
-  const actualTriangleBottom = triangleHeight/2 - actualTriangleHeight/3; // Bottom vertices are 1/3 up from bottom
 
   // Text spacing from triangle edges
   const textSpacing = 100;
@@ -49,38 +45,47 @@ export default makeScene2D(function* (view) {
         rotation={0}
       />
 
-      {/* Confidentiality text - positioned above the triangle with fixed distance */}
+      {/* Confidentiality text - positioned above vertex 0 (top) */}
       <Txt
         ref={confidentialityText}
         fontSize={sceneHeight * 0.08}
         fontFamily="Helvetica"
         fill={Posit.blue}
         text="Confidentiality"
-        position={() => [triangleRef().position.x(), triangleRef().position.y() - triangleHeight/2 - textSpacing]}
+        position={() => [
+          triangleRef().vertex(0).x,
+          triangleRef().vertex(0).y - textSpacing
+        ]}
         textAlign="center"
         opacity={0}
       />
 
-      {/* Integrity text - positioned below the actual triangle bottom left with fixed distance */}
+      {/* Integrity text - positioned below vertex 2 (bottom left) */}
       <Txt
         ref={integrityText}
         fontSize={sceneHeight * 0.08}
         fontFamily="Helvetica"
         fill={Posit.blue}
         text="Integrity"
-        position={() => [triangleRef().bottomLeft().x, triangleRef().position.y() + actualTriangleBottom + textSpacing]}
+        position={() => [
+          triangleRef().vertex(2).x,
+          triangleRef().vertex(2).y + textSpacing
+        ]}
         textAlign="center"
         opacity={0}
       />
 
-      {/* Availability text - positioned below the actual triangle bottom right with fixed distance */}
+      {/* Availability text - positioned below vertex 1 (bottom right) */}
       <Txt
         ref={availabilityText}
         fontSize={sceneHeight * 0.08}
         fontFamily="Helvetica"
         fill={Posit.blue}
         text="Availability"
-        position={() => [triangleRef().bottomRight().x, triangleRef().position.y() + actualTriangleBottom + textSpacing]}
+        position={() => [
+          triangleRef().vertex(1).x,
+          triangleRef().vertex(1).y + textSpacing
+        ]}
         textAlign="center"
         opacity={0}
       />
@@ -90,15 +95,14 @@ export default makeScene2D(function* (view) {
   // Triangle appears immediately (it's already visible)
   // Then animate each text label sequentially with 1 second gaps
 
-  // Wait 1 second, then fade in "Confidentiality"
-  // yield* waitFor(1);
-  yield* confidentialityText().opacity(1, 1);
+  // Fade in "Confidentiality"
+  yield* confidentialityText().opacity(1, 2);
 
   // Wait 1 second, then fade in "Integrity"
-  yield* waitFor(1);
-  yield* integrityText().opacity(1, 1);
+  // yield* waitFor(1);
+  yield* integrityText().opacity(1, 2);
 
   // Wait 1 second, then fade in "Availability"
-  yield* waitFor(1);
-  yield* availabilityText().opacity(1, 1);
+  // yield* waitFor(1);
+  yield* availabilityText().opacity(1, 2);
 });
