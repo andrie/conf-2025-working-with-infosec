@@ -41,6 +41,48 @@ export default makeScene2D(function* (view) {
 - `size`, `margin`, `padding`
 - Relative positioning with `position.x()`, `position.y()`
 
+**Layout Component Usage:**
+The `<Layout>` component is a container that automatically organizes and positions its child elements in a structured hierarchy.
+
+```typescript
+import {Layout, Txt, Rect} from '@motion-canvas/2d/lib/components';
+
+<Layout layout gap={20} alignItems={'center'}>
+  <Txt fill={'white'}>Example</Txt>
+  <Rect fill={'#f3303f'} padding={20}>
+    <Txt>Child content</Txt>
+  </Rect>
+</Layout>
+```
+
+**Key Layout Properties:**
+- `layout` - Enables layout mode
+- `gap={number}` - Spacing between child elements
+- `alignItems={'center' | 'start' | 'end'}` - Vertical alignment
+- `direction={'row' | 'column'}` - Layout direction (default: column)
+
+**Layout Benefits:**
+1. **Automatic positioning** - No need to manually calculate positions
+2. **Consistent spacing** - `gap` property handles uniform spacing
+3. **Responsive alignment** - Children automatically align based on container
+4. **Hierarchical organization** - Creates clean parent-child relationships
+
+**Practical Example:**
+Instead of manually positioning elements separately:
+```typescript
+// Instead of this:
+<Rect ref={appBox} position={[450, -100]} />
+<Txt ref={appText} position={[450, -100]} />
+
+// Use Layout:
+<Layout position={[450, -100]} alignItems={'center'}>
+  <Rect ref={appBox} width={270} height={135} />
+  <Txt ref={appText}>App</Txt>
+</Layout>
+```
+
+This automatically centers the text within the box and keeps them grouped together as a single unit.
+
 #### Common Patterns
 
 ##### Basic Animation Setup
@@ -422,6 +464,94 @@ yield* codeRef().code(`new code content`, duration);
 yield* codeRef().selection(lines(0, 5), duration);
 ```
 
+#### Polygon Component Geometry and Positioning
+
+**Understanding Inscribed Polygon Behavior:**
+The Motion Canvas `Polygon` component creates regular polygons inscribed within an ellipse defined by the `size` property. This has important implications for triangles and other low-sided polygons.
+
+**Key Insights from Source Code Analysis:**
+```typescript
+// From Polygon.ts vertex() method:
+public vertex(index: number): Vector2 {
+  const size = this.computedSize().scale(0.5);
+  const theta = (index * 2 * Math.PI) / this.sides();
+  const direction = Vector2.fromRadians(theta).perpendicular;
+  return direction.mul(size);
+}
+```
+
+**Critical Understanding:**
+1. **Inscribed Circle/Ellipse**: Polygons are inscribed in the ellipse defined by width/height
+2. **Actual Size Difference**: The visual polygon is smaller than the bounding box
+3. **Triangle Specifics**: For triangles, this difference is particularly noticeable
+
+**Triangle Positioning Calculations:**
+```typescript
+// Triangle geometry in Motion Canvas
+const desiredWidth = 300;
+const desiredHeight = 200;
+
+// Compensate for inscribed behavior
+const triangleWidth = desiredWidth / 0.866;  // ~√3/2 compensation
+const triangleHeight = desiredHeight / 0.75; // Height compensation
+
+// Calculate actual triangle dimensions
+const actualTriangleHeight = (3/4) * triangleHeight; // 75% of bounding box
+const actualTriangleBottom = triangleHeight/2 - actualTriangleHeight/3;
+```
+
+**Positioning Text Around Triangles:**
+When positioning text around polygon triangles, avoid using the bounding box dimensions:
+
+```typescript
+// ❌ Wrong - uses bounding box bottom
+position={() => [triangle().bottomLeft().x, triangle().bottomLeft().y + 50]}
+
+// ✅ Correct - uses calculated triangle geometry
+const textSpacing = 100;
+position={() => [
+  triangle().bottomLeft().x,
+  triangle().position.y() + actualTriangleBottom + textSpacing
+]}
+```
+
+**Triangle Edge Alignment:**
+- **Top edge**: Triangle touches the top of bounding box: `position.y() - triangleHeight/2`
+- **Bottom edges**: Triangle vertices are at calculated position, not bounding box bottom
+- **Side alignment**: Use `bottomLeft().x` and `bottomRight().x` for horizontal positioning
+
+**Best Practices:**
+1. **Calculate actual geometry** rather than relying on bounding box dimensions
+2. **Use fixed spacing values** instead of percentage-based positioning for text
+3. **Test with different polygon sizes** to ensure positioning remains consistent
+4. **Consider rotation effects** when using rotated polygons
+
+**Example Implementation:**
+```typescript
+// InfoSec triad triangle with proper text positioning
+const textSpacing = 100;
+
+<Polygon sides={3} size={[triangleWidth, triangleHeight]} />
+
+<Txt
+  text="Top Label"
+  position={() => [
+    triangle().position.x(),
+    triangle().position.y() - triangleHeight/2 - textSpacing
+  ]}
+/>
+
+<Txt
+  text="Bottom Left"
+  position={() => [
+    triangle().bottomLeft().x,
+    triangle().position.y() + actualTriangleBottom + textSpacing
+  ]}
+/>
+```
+
+This approach ensures text remains properly positioned relative to the visual triangle edges rather than the invisible bounding box.
+
 #### Common Issues
 - Ensure proper TypeScript setup in `tsconfig.json`
 - Use `createRef()` for accessing node properties after creation
@@ -432,3 +562,4 @@ yield* codeRef().selection(lines(0, 5), duration);
 - Install appropriate Lezer parser packages for syntax highlighting (`npm i @lezer/javascript`)
 - For R language support, install the community parser: `npm i lezer-r`
 - TypeScript may show implicit 'any' warnings for community parsers like `lezer-r` - this is expected behavior
+- **Polygon positioning**: Remember that polygons are inscribed in their bounding ellipse - calculate actual geometry for precise positioning

@@ -1,102 +1,102 @@
+// Debug logging control
+const DEBUG_ENABLED = false; // Set to true to enable debug logging
+function debugLog(...args) {
+  if (DEBUG_ENABLED) {
+    console.log(...args);
+  }
+}
+
 // stop the animation if the loop attribute is set to false
 function stopAnimation(event) {
-  // pause the previous slide if it contains an animation
-  if (event && event.previousSlide) {
-    const prevPlayer = event.previousSlide.querySelector('motion-canvas-player');
-    if (prevPlayer && prevPlayer.player && prevPlayer.player.playerState?.current?.paused === false) {
-      prevPlayer.player.togglePlayback();
-    }
-  }
-
-  // Now handle the current slide's animation
+  debugLog('DEBUG: stopAnimation called', event ? 'with event' : 'without event');
   const player = Reveal.getCurrentSlide().querySelector('motion-canvas-player');
+  debugLog('DEBUG: player found:', !!player);
   if (player) {
+    debugLog('DEBUG: player loop attribute:', player.getAttribute('loop'));
+    debugLog('DEBUG: player auto attribute:', player.getAttribute('auto'));
+
     // this code assumes one animation per slide
     // TODO: make it work with multiple animations per slide
 
     // start the animation
-    console.log('motion-canvas.lua: setting auto to true')
-    // console.log('motion-canvas.lua: loop = ', player.player.playerState("loop"))
+    debugLog('motion-canvas.lua: setting auto to true')
+    // debugLog('motion-canvas.lua: loop = ', player.player.playerState("loop"))
     player.setAttribute('auto', 'true');
 
 
     const startCheckInterval = setInterval(() => {
       // wait for player to start
-      console.log('motion-canvas.lua: checking player...')
+      debugLog('motion-canvas.lua: checking player...')
       if (player.player) {
         clearInterval(startCheckInterval);
-        // Use the player's actual fps or default to 30 for lower overhead
-        const fps = player.player?.playback?.fps || 30;
-        maxf = 0;
+        const fps = 60; // frames per second
+        let maxf = 0;
         if (player.getAttribute('loop') === 'false'  ) {
-          console.log('motion-canvas.lua: loop is false')
+          debugLog('DEBUG: loop is false, setting up frame check interval')
           const frameCheckInterval = setInterval(() => {
             if (player.player && !player.player.active) {
+              debugLog('DEBUG: reactivating inactive player');
               player.player.activate()
             }
             if (player.player && player.player.frame) {
               const f = player.player.frame.value;
               const nf = player.player.endFrame;
-              if (f === nf || f < maxf) {
-                clearInterval(frameCheckInterval);
-                // Request seek to end frame
-                player.player.requestSeek(nf);
+              debugLog('DEBUG: frame check - current:', f, 'end:', nf);
 
-                // Listen for frame change to ensure we're at the end frame before deactivating
-                const frameChangeHandler = (frame) => {
-                  if (frame >= nf) {
-                    player.player.onFrameChanged.unsubscribe(frameChangeHandler);
-                    player.player.deactivate();
-                  }
-                };
-                player.player.onFrameChanged.subscribe(frameChangeHandler);
-
-                // Safety timeout in case frame change event doesn't fire
-                setTimeout(() => {
-                  player.player.onFrameChanged.unsubscribe(frameChangeHandler);
-                  player.player.deactivate();
-                }, 100);
+              // Track the maximum frame we've seen
+              if (f > maxf) {
+                maxf = f;
               }
-              maxf = f;
+
+              // Stop if we've reached the end frame, or if we've looped back to start after being near the end
+              if (f === nf || (maxf >= nf - 1 && f < 10)) {
+                debugLog('DEBUG: animation complete, stopping (maxf:', maxf, 'current:', f, 'end:', nf, ')');
+                clearInterval(frameCheckInterval);
+
+                // First deactivate the player to stop playback
+                debugLog('DEBUG: deactivating player');
+                player.player.deactivate();
+
+                // Then seek to the end frame
+                setTimeout(() => {
+                  debugLog('DEBUG: seeking to end frame after deactivation');
+                  player.player.requestSeek(nf);
+
+                  // Verify the final frame
+                  setTimeout(() => {
+                    if (player.player && player.player.frame) {
+                      const finalFrame = player.player.frame.value;
+                      debugLog('DEBUG: final frame after seek:', finalFrame);
+                    }
+                  }, 100);
+                }, 50);
+              }
             }
           }, 1000 / fps); // Check every frame
           
           // Clear the interval when the slide changes
           Reveal.addEventListener('slidechanged', () => {
+            debugLog('DEBUG: slide changed, clearing frame check interval');
             clearInterval(frameCheckInterval);
           });
+        } else {
+          debugLog('DEBUG: loop is not false (loop attribute value is:', player.getAttribute('loop'), ')');
         }
       }
     }, 50)  // wait for player to start
 
   }
-}
 
-// Initialize all players to be paused except current slide
-function initializePlayers() {
-  const allPlayers = document.querySelectorAll('motion-canvas-player');
-  let currentSlidePlayer = null;
-
-  // Only get current slide player if Reveal is ready
-  if (window.Reveal && Reveal.isReady()) {
-    currentSlidePlayer = Reveal.getCurrentSlide()?.querySelector('motion-canvas-player');
+  // pause the previous slide if it contains an animation
+  debugLog('DEBUG: checking previous slide for animations');
+  if (event && event.previousSlide) {
+    const prevPlayer = event.previousSlide.querySelector('motion-canvas-player');
+    debugLog('DEBUG: previous player found:', !!prevPlayer);
+    if (prevPlayer) {
+      debugLog('DEBUG: toggling playback on previous player');
+      prevPlayer.player.togglePlayback();
+    }
   }
-
-  allPlayers.forEach((player) => {
-    // Skip the current slide's player if we can identify it
-    if (currentSlidePlayer && player === currentSlidePlayer) {
-      return;
-    }
-
-    // If Reveal isn't ready, pause all players (safer default)
-    // If player is already loaded, pause it
-    if (player.player) {
-      const isPaused = player.player.playerState?.current?.paused;
-      if (!isPaused) {
-        player.player.togglePlayback(); // Pause
-      }
-    }
-  });
 }
 
 // Check every 100ms if Reveal is defined
@@ -105,32 +105,7 @@ document.addEventListener("DOMContentLoaded", function() {
     if (window.Reveal && Reveal.isReady()) {
       // If Reveal is defined, set up the event listener and clear the interval
       // console.log("Reveal is ready")
-
-      // Initialize players, preserving current slide's state
-      initializePlayers();
-
-      // Start animation on current slide
-      const currentPlayer = Reveal.getCurrentSlide().querySelector('motion-canvas-player');
-      if (currentPlayer) {
-        // Set auto attribute and start the current slide player
-        currentPlayer.setAttribute('auto', 'true');
-
-        // Wait for player object to be ready, then start it
-        const waitForPlayer = setInterval(() => {
-          if (currentPlayer.player) {
-            clearInterval(waitForPlayer);
-            if (currentPlayer.player.playerState?.current?.paused !== false) {
-              currentPlayer.player.togglePlayback();
-            }
-          }
-        }, 50);
-
-        // Safety timeout
-        setTimeout(() => {
-          clearInterval(waitForPlayer);
-        }, 5000);
-      }
-
+      stopAnimation()
       Reveal.on('slidechanged', stopAnimation);
       clearInterval(checkReveal);
     }

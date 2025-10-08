@@ -79,7 +79,7 @@ revealjs-plugins:
 
 ## What Infosec cares about
 
-![](_img/infosec_triad.drawio.svg){width=800px height=600px style="display:block; margin:auto;"}
+{{< motion-canvas ./animations/src/infosec-triad.js fullscreen auto loop=false >}}
 
 
 ## Risk: data leakage

@@ -1,10 +1,11 @@
 import {makeScene2D} from '@motion-canvas/2d';
 import {createRef, waitFor, all, easeInCubic, easeOutCubic} from '@motion-canvas/core';
-import {Rect, Txt, Line, Circle, Code} from '@motion-canvas/2d/lib/components';
+import {Rect, Txt, Line, Circle, Code, Layout} from '@motion-canvas/2d/lib/components';
 import {Posit, Colors} from '../styles';
 import {parser} from 'lezer-r';
 import {Database} from '../components/Database';
 import {RHighlighter} from '../components/RHighlighter';
+import {pulse} from '../utils/animations';
 
 
 export default makeScene2D(function* (view) {
@@ -24,10 +25,9 @@ export default makeScene2D(function* (view) {
   const codeComponent = createRef<Code>();
 
   // Diagram elements
-  const appBox = createRef<Rect>();
   const userText = createRef<Txt>();
-  const appText = createRef<Txt>();
-  const llmText = createRef<Txt>();
+  const appLayout = createRef<Layout>();
+  const llmLayout = createRef<Layout>();
 
   // Database component
   const database = createRef<Database>();
@@ -95,34 +95,51 @@ server <- function(input, output) {
         position={[100, -100]}
       />
 
-      {/* App box - with stroke like SVG */}
-      <Rect
-        ref={appBox}
-        width={270}
-        height={135}
-        fill="rgba(0,0,0,0)"
-        stroke={Posit.blue}
-        lineWidth={6.75}
-        position={[450, -100]}
-      />
-      <Txt
-        ref={appText}
-        fontSize={63}
-        fontFamily="Helvetica"
-        fill={Posit.blue}
-        text="App"
-        position={[450, -100]}
-      />
+      {/* App layout - box with centered text */}
+      <Layout
+        ref={appLayout}
+        position={[425, -100]}
+        size={[270, 135]}
+        alignItems={'center'}
+        justifyContent={'center'}
+      >
+        <Rect
+          width={270}
+          height={135}
+          fill="rgba(0,0,0,0)"
+          stroke={Posit.blue}
+          lineWidth={6.75}
+        />
+        <Txt
+          fontSize={63}
+          fontFamily="Helvetica"
+          fill={Posit.blue}
+          text="App"
+        />
+      </Layout>
 
-      {/* LLM - no box, just text */}
-      <Txt
-        ref={llmText}
-        fontSize={63}
-        fontFamily="Helvetica"
-        fill={Posit.blue}
-        text="LLM"
+      {/* LLM layout - box with centered text */}
+      <Layout
+        ref={llmLayout}
         position={[800, -100]}
-      />
+        size={[270, 135]}
+        alignItems={'center'}
+        justifyContent={'center'}
+      >
+        <Rect
+          width={270}
+          height={135}
+          fill="rgba(0,0,0,0)"
+          stroke={Posit.blue}
+          lineWidth={6.75}
+        />
+        <Txt
+          fontSize={63}
+          fontFamily="Helvetica"
+          fill={Posit.blue}
+          text="LLM"
+        />
+      </Layout>
 
       {/* Database component - 3D database cylinder */}
       <Database
@@ -138,7 +155,7 @@ server <- function(input, output) {
         ref={userToApp}
         points={[
           () => userText().right(),
-          () => appBox().left()
+          () => appLayout().left()
         ]}
         stroke={Posit.blue}
         lineWidth={4.5}
@@ -149,10 +166,9 @@ server <- function(input, output) {
 
       <Line
         ref={appToLlm}
-        // points={[[585, -100], [650, -100]]}
         points={[
-          () => appBox().right(),
-          () => llmText().left()
+          () => appLayout().right(),
+          () => llmLayout().left()
         ]}
         stroke={Posit.blue}
         lineWidth={4.5}
@@ -164,7 +180,7 @@ server <- function(input, output) {
       <Line
         ref={appToData}
         points={[
-          () => appBox().bottom(),
+          () => appLayout().bottom(),
           () => database().top()
         ]}
         stroke={Posit.blue}
@@ -179,15 +195,11 @@ server <- function(input, output) {
   // Start with empty code
   yield* codeComponent().code('', 0);
 
-  // Custom pulse animation for appBox - grow then shrink
-  yield* all(
-    appBox().lineWidth(15, 0.5, easeInCubic),
-    appBox().size([285, 170], 0.5, easeInCubic)
-  );
-  yield* all(
-    appBox().lineWidth(6.75, 0.5, easeOutCubic),
-    appBox().size([270, 135], 0.5, easeOutCubic)
-  );
+  // Pulse the app and llm layouts
+  yield* pulse(appLayout(), {duration: 1});
+  yield* pulse(database(), {duration: 1});
+  yield* pulse(llmLayout(), {duration: 1});
+
 
   // Animate code appearing line by line
 
@@ -198,8 +210,7 @@ server <- function(input, output) {
   // Reveal each line with 0.25 second delay
   for (let i = 0; i < lines.length; i++) {
     currentCode += (i > 0 ? '\n' : '') + lines[i];
-    yield* codeComponent().code(currentCode, 0.1); // Quick transition
-    yield* waitFor(0.1); // Wait 0.25 seconds before next line
+    yield* codeComponent().code(currentCode, 0.2); // Quick transition
   }
 
 });
