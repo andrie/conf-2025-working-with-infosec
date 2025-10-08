@@ -47,11 +47,11 @@ export default makeScene2D(function* (view) {
 
       {/* Confidentiality text - positioned above vertex 0 (top) */}
       <Txt
-        ref={confidentialityText}
+        ref={availabilityText}
         fontSize={sceneHeight * 0.08}
         fontFamily="Helvetica"
         fill={Posit.blue}
-        text="Confidentiality"
+        text="Availability"
         position={() => [
           triangleRef().vertex(0).x,
           triangleRef().vertex(0).y - textSpacing
@@ -77,11 +77,11 @@ export default makeScene2D(function* (view) {
 
       {/* Availability text - positioned below vertex 1 (bottom right) */}
       <Txt
-        ref={availabilityText}
+        ref={confidentialityText}
+        text="Confidentiality"
         fontSize={sceneHeight * 0.08}
         fontFamily="Helvetica"
         fill={Posit.blue}
-        text="Availability"
         position={() => [
           triangleRef().vertex(1).x,
           triangleRef().vertex(1).y + textSpacing
@@ -96,13 +96,13 @@ export default makeScene2D(function* (view) {
   // Then animate each text label sequentially with 1 second gaps
 
   // Fade in "Confidentiality"
+  yield* availabilityText().opacity(1, 2);
+  yield* integrityText().opacity(1, 2);
   yield* confidentialityText().opacity(1, 2);
 
   // Wait 1 second, then fade in "Integrity"
   // yield* waitFor(1);
-  yield* integrityText().opacity(1, 2);
 
   // Wait 1 second, then fade in "Availability"
   // yield* waitFor(1);
-  yield* availabilityText().opacity(1, 2);
 });

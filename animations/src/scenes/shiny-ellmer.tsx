@@ -147,7 +147,7 @@ server <- function(input, output) {
         size={[150, 150]}
         stroke={Posit.blue}
         lineWidth={6.75}
-        position={[450, 150]}
+        position={[425, 150]}
       />
 
       {/* Connection lines - bidirectional like SVG */}
@@ -196,9 +196,9 @@ server <- function(input, output) {
   yield* codeComponent().code('', 0);
 
   // Pulse the app and llm layouts
-  yield* pulse(appLayout(), {duration: 1});
-  yield* pulse(database(), {duration: 1});
-  yield* pulse(llmLayout(), {duration: 1});
+  // yield* pulse(appLayout(), {duration: 1});
+  // yield* pulse(database(), {duration: 1});
+  // yield* pulse(llmLayout(), {duration: 1});
 
 
   // Animate code appearing line by line

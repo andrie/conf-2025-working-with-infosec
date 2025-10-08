@@ -50,7 +50,8 @@ revealjs-plugins:
 
 ## Touching multiple data sources
 
-![](_img/multiple_sources.drawio.svg){width=1200px height=900px style="display:block; margin:auto;"}
+<!-- ![](_img/multiple_sources.drawio.svg){width=1200px height=900px style="display:block; margin:auto;"} -->
+{{< motion-canvas ./animations/src/multi-database.js fullscreen loop=false auto=false >}}
 
 ::: {.notes}
 - Mixing SFDC and zendesk

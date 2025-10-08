@@ -147,6 +147,50 @@ yield* text().text("Animated Text", 1);
 - `make serve` - Alternative via Makefile
 - `make anim` - Build animations via Makefile
 
+#### Creating a New Scene
+
+To add a new scene to the project, follow these steps:
+
+1. **Create the scene file**: Create `animations/src/scenes/scene-name.tsx`
+   - Contains the actual animation logic using `makeScene2D()`
+   - Uses Motion Canvas components (Rect, Txt, Circle, etc.)
+
+2. **Create the project file**: Create `animations/src/scene-name.ts`
+   - Defines the Motion Canvas project configuration
+   - Imports and references the scene file
+
+3. **Update vite.config.ts**: Add the project file to the project array
+   - Add `"./src/scene-name.ts"` to the `project` array in `motionCanvas()` plugin
+
+**Example Scene Structure:**
+```typescript
+// animations/src/scenes/example.tsx
+import {makeScene2D} from '@motion-canvas/2d';
+import {Rect, Txt} from '@motion-canvas/2d/lib/components';
+import {createRef} from '@motion-canvas/core';
+
+export default makeScene2D(function* (view) {
+  const rect = createRef<Rect>();
+
+  view.add(
+    <Rect ref={rect} width={100} height={100} fill="#ff0000" />
+  );
+
+  yield* rect().scale(2, 1);
+});
+```
+
+**Example Project File:**
+```typescript
+// animations/src/example.ts
+import {makeProject} from '@motion-canvas/core';
+import scene from './scenes/example?scene';
+
+export default makeProject({
+  scenes: [scene],
+});
+```
+
 #### InfoSec Animation Context
 This project creates animations for a security presentation. Consider:
 - Security-themed colors (red, orange, green for alerts/status)
