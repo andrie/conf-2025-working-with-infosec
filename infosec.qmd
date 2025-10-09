@@ -13,7 +13,7 @@ format:
     - _fonts/*/*
     theme: 
     - night
-    - custom.scss
+    - theme.scss
     # - extent.scss
     menu: false
     include-in-header: 
@@ -23,8 +23,9 @@ format:
       autoelements: {"img": {"animation":"animate__fadeIn", "speed":"slow", "delay":"50"}}
       appearevent: slidechanged
     gongtimer:
-      allottedTime: 5
+      allottedTime: 5.5
       barColor: "#447099"
+    auto-slide: 25000
 
 project:
   preview:
@@ -36,11 +37,11 @@ revealjs-plugins:
 
 ---
 
-## Working with Infosec {.hidetitle}
+## Working with Infosec {.hidetitle autoslide=15000}
 
 {{< motion-canvas ./animations/src/posit_footer.js auto fullscreen=true >}}
 
-# About twenty lines of {ellmer} code
+# About twenty lines of {ellmer} code {autoslide=30000}
 
 {{< motion-canvas ./animations/src/shiny-ellmer.js fullscreen loop=false auto=false >}}
 
@@ -60,7 +61,7 @@ revealjs-plugins:
 
 
 
-# But... InfoSec!
+# But... you have to deal with Infosec! {autoslide=5000}
 
 ::: {.notes}
 - Create read-only copy of the data you actually work with
@@ -68,7 +69,7 @@ revealjs-plugins:
 :::
 
 
-# Working with Infosec to get to production
+# Working with Infosec to get to production {autoslide=15000}
 
 ::: .editable
 -  Andrie de Vries
@@ -76,11 +77,11 @@ revealjs-plugins:
 - Director of Product Strategy, Posit
 :::
 
-{{< motion-canvas ./animations/src/posit_footer.js fullscreen auto >}}
+{{< motion-canvas ./animations/src/posit_footer.js fullscreen auto=false >}}
 
-## What Infosec cares about
+## What Infosec cares about {autoslide=30000}
 
-{{< motion-canvas ./animations/src/infosec-triad.js fullscreen auto loop=false >}}
+{{< motion-canvas ./animations/src/infosec-triad.js fullscreen auto=false loop=false >}}
 
 
 ## Risk: data leakage
@@ -104,11 +105,11 @@ revealjs-plugins:
 
 
 
-# Solutions
+# Solutions {autoslide=15000}
 
 {{< motion-canvas ./animations/src/hexagons.js background fullscreen loop=false >}}
 
-## Consider:
+## Consider: {autoslide=60000}
 
 - Authorisation
   - Minimal permissions
@@ -130,13 +131,6 @@ revealjs-plugins:
 
 - Start the conversation as early as possible
 - Your InfoSec team will attempt to enable you
-
-
-
-
-
-
-
 
 
 ## End {.hidetitle}
