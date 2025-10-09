@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "motion-canvas-server": {
+      "command": "node",
+      "args": ["/home/andrie/github/conf-2025-working-with-infosec/motion-canvas-mcp/dist/server.js"],
+      "env": {
+        "NODE_ENV": "production",
+        "MCP_LOG_LEVEL": "debug"
+      },
+      "transport": "stdio"
+    }
+  }
+}

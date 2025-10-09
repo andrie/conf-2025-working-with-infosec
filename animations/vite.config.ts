@@ -5,14 +5,14 @@ import copy from "rollup-plugin-copy";
 export default defineConfig({
   plugins: [
     motionCanvas({
-      project: [
-        "./src/hexagons.ts",
+      project: ["./src/hexagons.ts",
         "./src/posit_footer.ts",
         "./src/posit-logo.ts",
         "./src/shiny-ellmer.ts",
         "./src/infosec-triad.ts",
         "./src/multi-database.ts"
-      ],
+      // "./src/test_scene_new.ts"
+  ],
     }),
   ],
   build: {
